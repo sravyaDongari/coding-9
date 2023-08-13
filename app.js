@@ -4,7 +4,7 @@ const sqlite3 = require("sqlite3");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const databasePath = path.join(__dirname, "covid19IndiaPortal");
+const databasePath = path.join(__dirname, "covid19IndiaPortal.db");
 const app = express();
 app.use(express.json());
 let database = null;
