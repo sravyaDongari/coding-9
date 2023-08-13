@@ -1,96 +1,54 @@
-# Authentication
+# Covid-19 India Portal
 
-Given an `app.js` file and a database file `userData.db` consisting of a  table `user`.
+Given two files `app.js` and a database file `covid19IndiaPortal.db` consisting of three tables `state`, `district` and `user`.
 
-Write APIs to perform operations on the table `user` containing the following columns,
+Write APIs to perform operations on the tables `state`, `district` only after authentication of the user.
 
-**User Table**
+The columns of the tables are given below,
 
-| Column   | Type    |
-| -------- | ------- |
-| username | TEXT |
-| name     | TEXT    |
-| password | TEXT    |
-| gender   | TEXT    |
-|location|TEXT|
+**State Table**
 
-### API 1
+| Columns    | Type    |
+| ---------- | ------- |
+| state_id   | INTEGER |
+| state_name | TEXT    |
+| population | INTEGER |
 
-#### Path: `/register`
+**District Table**
 
-#### Method: `POST`
+| Columns       | Type    |
+| ------------- | ------- |
+| district_id   | INTEGER |
+| district_name | TEXT    |
+| state_id      | INTEGER |
+| cases         | INTEGER |
+| cured         | INTEGER |
+| active        | INTEGER |
+| deaths        | INTEGER |
 
-**Request**
+You can use your previous code if required.
+
+#### Sample Valid User Credentials
 
 ```
 {
-  "username": "adam_richard",
-  "name": "Adam Richard",
-  "password": "richard_567",
-  "gender": "male",
-  "location": "Detroit"
+  "username": "christopher_phillips",
+  "password": "christy@123"
 }
 ```
 
-- **Scenario 1**
+### API 1
 
-  - **Description**:
-
-    If the username already exists
-
-  - **Response**
-    - **Status code**
-      ```
-      400
-      ```
-    - **Status text**
-      ```
-      User already exists
-      ```
-
-- **Scenario 2**
-
-  - **Description**:
-
-    If the registrant provides a password with less than 5 characters
-
-  - **Response**
-    - **Status code**
-      ```
-      400
-      ```
-    - **Status text**
-      ```
-      Password is too short
-      ```
-
-- **Scenario 3**
-
-  - **Description**:
-
-    Successful registration of the registrant
-
-  - **Response**
-      - **Status code**
-        ```
-        200
-        ```
-      - **Status text**
-       ```
-       User created successfully
-       ```
-
-### API 2
-
-#### Path: `/login`
+#### Path: `/login/`
 
 #### Method: `POST`
 
 **Request**
+
 ```
 {
-  "username": "adam_richard",
-  "password": "richard_567"
+  "username": "christopher_phillips",
+  "password": "christy@123"
 }
 ```
 
@@ -105,7 +63,7 @@ Write APIs to perform operations on the table `user` containing the following co
       ```
       400
       ```
-    - **Status text**
+    - **Body**
       ```
       Invalid user
       ```
@@ -114,14 +72,14 @@ Write APIs to perform operations on the table `user` containing the following co
 
   - **Description**:
 
-    If the user provides incorrect password
+    If the user provides an incorrect password
 
   - **Response**
     - **Status code**
       ```
       400
       ```
-    - **Status text**
+    - **Body**
       ```
       Invalid password
       ```
@@ -133,79 +91,202 @@ Write APIs to perform operations on the table `user` containing the following co
     Successful login of the user
 
   - **Response**
-    - **Status code**
-      ```
-      200
-      ```
-    - **Status text**
-      ```
-      Login success!
-      ```
 
-### API 3
+    Return the JWT Token
 
-#### Path: `/change-password`
+    ```
+    {
+      "jwtToken": "ak2284ns8Di32......"
+    }
+    ```
 
-#### Method: `PUT`
-
-**Request**
-
-```
-{
-  "username": "adam_richard",
-  "oldPassword": "richard_567",
-  "newPassword": "richard@123"
-}
-```
+### Authentication with Token
 
 - **Scenario 1**
 
   - **Description**:
 
-    If the user provides incorrect current password
+    If the token is not provided by the user or an invalid token
 
   - **Response**
     - **Status code**
       ```
-      400
+      401
       ```
-    - **Status text**
+    - **Body**
       ```
-      Invalid current password
+      Invalid JWT Token
       ```
 
 - **Scenario 2**
+  After successful verification of token proceed to next middleware or handler
 
-  - **Description**:
+### API 2
 
-    If the user provides new password with less than 5 characters
+#### Path: `/states/`
 
-  - **Response**
-    - **Status code**
-      ```
-      400
-      ```
-    - **Status text**
-      ```
-      Password is too short
-      ```
+#### Method: `GET`
 
-- **Scenario 3**
+#### Description:
 
-  - **Description**:
+Returns a list of all states in the state table
 
-    Successful password update
+#### Response
 
-  - **Response**
-    - **Status code**
-      ```
-      200
-      ```
-    - **Status text**
-      ```
-      Password updated
-      ```
+```
+[
+  {
+    "stateId": 1,
+    "stateName": "Andaman and Nicobar Islands",
+    "population": 380581
+  },
 
+  ...
+]
+```
+
+### API 3
+
+#### Path: `/states/:stateId/`
+
+#### Method: `GET`
+
+#### Description:
+
+Returns a state based on the state ID
+
+#### Response
+
+```
+{
+  "stateId": 8,
+  "stateName": "Delhi",
+  "population": 16787941
+}
+```
+
+### API 4
+
+#### Path: `/districts/`
+
+#### Method: `POST`
+
+#### Description:
+
+Create a district in the district table, `district_id` is auto-incremented
+
+#### Request
+
+```
+{
+  "districtName": "Bagalkot",
+  "stateId": 3,
+  "cases": 2323,
+  "cured": 2000,
+  "active": 315,
+  "deaths": 8
+}
+```
+
+#### Response
+
+```
+District Successfully Added
+```
+
+### API 5
+
+#### Path: `/districts/:districtId/`
+
+#### Method: `GET`
+
+#### Description:
+
+Returns a district based on the district ID
+
+#### Response
+
+```
+{
+  "districtId": 322,
+  "districtName": "Palakkad",
+  "stateId": 17,
+  "cases": 61558,
+  "cured": 59276,
+  "active": 2095,
+  "deaths": 177
+}
+```
+
+### API 6
+
+#### Path: `/districts/:districtId/`
+
+#### Method: `DELETE`
+
+#### Description:
+
+Deletes a district from the district table based on the district ID
+
+#### Response
+
+```
+District Removed
+
+```
+
+### API 7
+
+#### Path: `/districts/:districtId/`
+
+#### Method: `PUT`
+
+#### Description:
+
+Updates the details of a specific district based on the district ID
+
+#### Request
+
+```
+{
+  "districtName": "Nadia",
+  "stateId": 3,
+  "cases": 9628,
+  "cured": 6524,
+  "active": 3000,
+  "deaths": 104
+}
+```
+
+#### Response
+
+```
+
+District Details Updated
+
+```
+
+### API 8
+
+#### Path: `/states/:stateId/stats/`
+
+#### Method: `GET`
+
+#### Description:
+
+Returns the statistics of total cases, cured, active, deaths of a specific state based on state ID
+
+#### Response
+
+```
+{
+  "totalCases": 724355,
+  "totalCured": 615324,
+  "totalActive": 99254,
+  "totalDeaths": 9777
+}
+
+```
 
 <br/>
 
@@ -214,3 +295,5 @@ Use `npm install` to install the packages.
 **Export the express instance using the default export syntax.**
 
 **Use Common JS module syntax.**
+
+
